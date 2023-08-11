@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(cors());
 
 app.get('/', (req, res) => {
-    res.send(database.users);
+    res.send('workingg');
 })
 
 app.post('/signin', (req, res) => {signIn.handleSignIn(req, res, knex, bcrypt)})
@@ -41,6 +41,6 @@ app.put('/image', (req, res) => {imageCount.imageCount (req, res, knex)})
 
 app.post('/imageurl', (req, res) => {imageCount.handleFRCall(req, res)})
 
-app.listen(PORT || 3000, () => {
+app.listen(PORT || 10000, () => {
     console.log(`now listening on ${PORT}`);
 })
