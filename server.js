@@ -41,6 +41,6 @@ app.put('/image', (req, res) => {imageCount.imageCount (req, res, knex)})
 
 app.post('/imageurl', (req, res) => {imageCount.handleFRCall(req, res)})
 
-app.listen(3000, () => {
-    console.log(`now listening on 3000`);
+app.listen(PORT, () => {
+    console.log(`now listening on ${PORT}`);
 })
