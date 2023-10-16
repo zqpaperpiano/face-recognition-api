@@ -38,7 +38,9 @@ var User = require('./Schema/registrationSchema.js');
 app.get('/', (req, res) => {
   User.find({})
   .then(data => res.json(data))
-  .catch(err => console.log("Error occured, " + err));
+  .catch(err => {
+    res.json('not working :(');
+    console.log("Error occured, " + err)});
 });
 
 app.post('/signin', (req, res) => {signIn.handleSignIn(req, res, bcrypt)})
