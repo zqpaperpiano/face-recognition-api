@@ -12,15 +12,6 @@ const getUser = require('./controllers/getUser')
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const cors = require('cors');
-const knex = require('knex')({
-    client: 'pg',
-    connection: {
-      host : '127.0.0.1',
-      port : 5432,
-      user : 'postgres',
-      database : 'testdb'
-    }
-  });
 
 const mongoose = require("mongoose");
 mongoose.connect(
@@ -36,11 +27,12 @@ app.use(cors());
 var User = require('./Schema/registrationSchema.js');
 
 app.get('/', (req, res) => {
-  User.find({})
-  .then(data => res.json(data))
-  .catch(err => {
-    res.json(err);
-    console.log("Error occured, " + err)});
+  res.json('hello');
+  // User.find({})
+  // .then(data => res.json(data))
+  // .catch(err => {
+  //   res.json(err);
+  //   console.log("Error occured, " + err)});
 });
 
 app.post('/signin', (req, res) => {signIn.handleSignIn(req, res, bcrypt)})
