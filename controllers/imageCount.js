@@ -38,32 +38,47 @@ const handleFRCall = (req, res) => {
     + "/outputs", returnClarifaiRequestOptions(url))
     .then(resp => resp.json())
     .then(resp => 
-        res.json(resp.outputs[0].data.regions[0].region_info.bounding_box)
+        {
+            // console.log('resp :', resp);
+            // console.log(typeof resp.status.code);
+            // console.log('data: ', resp.outputs[0].data, 'length: ', resp.outputs[0].data.regions);
+            if(resp.status.code === 30104){
+                // console.log('caught!');
+                res.status(400).json('Please enter a valid URL')    ;
+            }else if(resp.outputs[0].data.regions === undefined){
+                // console.log("unable to detect a face");
+                res.status(400).json('No face identified');
+            }else{
+                // console.log('here');
+                res.json(resp.outputs[0].data.regions)
+            }
+        }
     )
     .catch(err => 
-        {return res.status(400).json('unable to work with API')}
+        {return res.status(400).json('unable to work with API')} 
         )
 }
 
-const imageCount = (req, res, knex) => {
-    const {id} = req.body;
-    knex('user').where('id', '=', id)
-    .update({
-        'entries': knex.raw('entries + 1')
-    })
-    .then(knex.select('entries').from('user').where({id})
-    .then(user => {
-        let temp = JSON.stringify(user);
-        let count = "";
-        for(let i = 12; i < temp.length - 2; ++i){
-            count = count + temp[i]
-        }
-        temp = parseInt(count);
-        res.json(count)
-    }))
-    .catch(err => res.status(400).json('error getting user'))
-}
+var User = require("../Schema/registrationSchema");
 
+const imageCount = (req, res) => {
+    const {email} = req.body;
+
+    User.findOneAndUpdate(
+        {email: email}, 
+        {$inc: { imageCount: 1 }},
+        {
+            new: true
+        })
+        .then((data) => {
+            res.json(data.imageCount);
+        })
+        .catch((err) => {
+            console.log('err: ', err);
+            res.json('error');
+        })
+}
+ 
 module.exports = {
     imageCount,
     handleFRCall

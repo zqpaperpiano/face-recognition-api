@@ -1,28 +1,32 @@
-const handleSignIn = (req, res, knex, bcrypt) => {
+var User = require('../Schema/registrationSchema');
+var UserPassword = require('../Schema/registerPasswordSchema');
+
+const handleSignIn = (req, res, bcrypt) => {
     const {email, password} = req.body;
     if(!email || !password){
         return res.status(400).json('All fields must be filled in')
     }
-    knex.select('hash').from('login').where('email', '=', email)
+
+    UserPassword.find({ email: email})
+    .exec()
+    .then(data => {
+        return data[0]
+    })
     .then(hash => {
-        let mapResp = JSON.stringify(hash);
-        let stringHash = "";
-        for(let i = 10; i < mapResp.length - 3; ++i){
-            stringHash = stringHash + mapResp[i];
-        }
-        bcrypt.compare(password, stringHash)
+        bcrypt.compare(password, hash.password)
         .then(result => {
-            console.log(result);
             if(result){
-                knex.from('user').where({email})
-                .then(user => res.json(user))
-            }
-            else{
-                res.json('wrong credentials')
+                User.find({email: email})
+                .then(data => res.json(data));
+            }else{
+                res.status(401).json('wrong credentials');
             }
         })
     })
-    .catch(err => res.json(err))
+    .catch(err => {
+        res.status(401).json('wrong credentials ');
+        console.log('error: ', err);
+    })
 }
 
 module.exports = {
