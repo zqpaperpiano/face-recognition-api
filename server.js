@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
   User.find({})
   .then(data => res.json(data))
   .catch(err => {
-    res.json('not working :(');
+    res.json(err);
     console.log("Error occured, " + err)});
 });
 
