@@ -27,12 +27,12 @@ app.use(cors());
 var User = require('./Schema/registrationSchema.js');
 
 app.get('/', (req, res) => {
-  res.json('hello');
-  // User.find({})
-  // .then(data => res.json(data))
-  // .catch(err => {
-  //   res.json(err);
-  //   console.log("Error occured, " + err)});
+  // res.json('hello');
+  User.find({})
+  .then(data => res.json(data))
+  .catch(err => {
+    res.json("error!: ", err);
+    console.log("Error occured, " + err)});
 });
 
 app.post('/signin', (req, res) => {signIn.handleSignIn(req, res, bcrypt)})
