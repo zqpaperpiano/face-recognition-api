@@ -24,8 +24,9 @@ const handleRegister = async (req, res, bcrypt, saltRounds) => {
 
         // console.log('saving user now...');
         saveUser(newUser)
-        .then((data) => {
-            if(data === null){
+        .then((registeredUser) => {
+            console.log('data from saveUser: ', registeredUser);
+            if(registeredUser === null){
                 // console.log('email already exists');
                 res.status(401).json("Email already exists");
             }
@@ -33,13 +34,15 @@ const handleRegister = async (req, res, bcrypt, saltRounds) => {
                 // console.log('all good, going to save password now');
                 savePassword(newUserPassword)
                 .then((data) => {
+                    console.log('data from save Password: ', data);
                     if(data === false){
                         console.log('something went wrong...');
                         User.find({email: email})
-                            .then(user => {user.remove()});
+                            .then(user => {User.remove(user)});
                             // console.log('user removed due to error');
                         res.status(400).json('unable to register');
                     }
+                    res.json(registeredUser);
                 })
             }
         })
@@ -55,7 +58,7 @@ const handleRegister = async (req, res, bcrypt, saltRounds) => {
 
 const saveUser = async (newUser) => {
     try{
-        registered = await newUser.save()
+        var registered = await newUser.save()
         return registered;
     }catch(err){
         console.log('error found: ');
@@ -66,9 +69,10 @@ const saveUser = async (newUser) => {
 
 const savePassword = async(userPassword) => {
     try{
-        savePassword = await userPassword.save()
+        var savePassword = await userPassword.save()
         return true;
     }catch(err){
+        console.log('error caught here: ', err);
         return false;
     }
 }
