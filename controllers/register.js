@@ -1,7 +1,7 @@
 var User = require('../Schema/registrationSchema.js');
 var UserPassword = require('../Schema/registerPasswordSchema.js');
 
-const handleRegister = (req, res, bcrypt, saltRounds) => {
+const handleRegister = async (req, res, bcrypt, saltRounds) => {
     const { email, name, password } = req.body;
 
 
@@ -21,25 +21,82 @@ const handleRegister = (req, res, bcrypt, saltRounds) => {
             email: email,
             password: hash
         });
-        try{
-            newUser.save()
-            .then(() => newUserPassword.save())
-            .then(() => console.log("entry added"),
-            err => {
-                User.find({email: email})
-                .then(user => user.remove());
-                console.log('user removed due to error');
-                res.json("error registering");
-                console.log('error here!: ', err);
-        }
-            )
-            .then(res.json(newUser));
-        }catch(err){
-            console.log("Error: ", err);
-            res.status(400).json('Error registering');
-        }
+
+        // console.log('saving user now...');
+        saveUser(newUser)
+        .then((data) => {
+            if(data === null){
+                // console.log('email already exists');
+                res.status(401).json("Email already exists");
+            }
+            else{
+                // console.log('all good, going to save password now');
+                savePassword(newUserPassword)
+                .then((data) => {
+                    if(data === false){
+                        console.log('something went wrong...');
+                        User.find({email: email})
+                            .then(user => {user.remove()});
+                            // console.log('user removed due to error');
+                        res.status(400).json('unable to register');
+                    }
+                })
+            }
+        })
+        .catch((err) => {console.log(err)});
+        
+
+
+        // newUser.save()
+        // .then(console.log('hello'))
+        // .catch((err) => console.log('this is an error'));
     })
 }
+
+const saveUser = async (newUser) => {
+    try{
+        registered = await newUser.save()
+        return registered;
+    }catch(err){
+        console.log('error found: ');
+        return null;
+    }
+    
+}
+
+const savePassword = async(userPassword) => {
+    try{
+        savePassword = await userPassword.save()
+        return true;
+    }catch(err){
+        return false;
+    }
+}
+        // .then(() => {
+        // console.log('saving new user and password.....')
+        // if(err){
+        //     console.log('found an error: ', err);
+        // }}) 
+                // newUserPassword.save()},
+                // err => {
+                //     return('error...');
+                // })
+            // .then(() => console.log("entry added")
+            // .then(
+            //     console.log('entered somewhere i shouldnt have'))
+            // err => {
+            //     console.log('entered err part...');
+            //     User.find({email: email})
+            //     .then(user => {user.remove()});
+            //     console.log('user removed due to error');
+            //     res.json("error registering");
+            //     console.log('error here!: ', err);
+            //     } 
+            // )
+            
+                // res.json(newUser));
+//     })
+// }
 
 module.exports = {
     handleRegister: handleRegister
